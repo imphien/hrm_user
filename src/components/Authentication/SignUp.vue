@@ -12,7 +12,7 @@
                     <input type="password" placeholder="Nhập mật khẩu" style="flex: 1;">
                 </div>
                 <label class="mb-5">
-                    <input type="checkbox" id="save_name">Nhớ tên đăng nhập
+                    <input class="me-2" type="checkbox" id="save_name">Nhớ tên đăng nhập
                 </label>
                 <div class="d-grid gap-2 d-md-block">
                     <button class="btn btn-primary" type="button">ĐĂNG NHẬP</button>
@@ -31,9 +31,9 @@
         padding: 20px 0 50px 0;
     }
     .form-login {
-        width: 600px;
-        height: 600px;
-        background-color: rgb(227, 227, 227);
+        width: 400px;
+        height: 400px;
+        background-color: #faf7ed;
         margin: 5% auto 15% auto;
         border-radius: 20px;
     }
