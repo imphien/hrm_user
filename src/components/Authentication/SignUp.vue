@@ -1,24 +1,25 @@
 <template>
-    <div class="tien">
-      <form class="form-login">
-        <h1 class="title">Đăng nhập</h1>
-        <div class="container d-flex flex-column">
-          <div class="d-flex mb-3">
-            <label class="form-label" for="email" style="min-width: 100px;">Email</label>
-            <input type="text" placeholder="Nhập email" style="flex: 1;">
-          </div>
-          <div class="d-flex mb-3">
-            <label class="form-label" style="min-width: 100px;">Mật khẩu</label>
-            <input type="password" placeholder="Nhập mật khẩu" style="flex: 1;">
-          </div>
-          <label class="mb-5">
-            <input class="me-2" type="checkbox" id="save_name">Nhớ tên đăng nhập
-          </label>
-          <div class="d-grid gap-2 d-md-block">
-            <button class="btn btn-primary" type="button">ĐĂNG NHẬP</button>
-          </div>
-        </div>
-      </form>
+    <div class="container d-flex justify-content-center align-items-center">
+        <form class="form d-flex flex-column rounded-4">
+            <h1 class="text-center pt-4 pb-4">Đăng nhập</h1>
+            <div class="d-flex px-4 py-2">
+                <label class="pt-1" for="email">Tên đăng nhập</label>
+                <input class="rounded-3 border-0 px-3" type="text" placeholder="Nhập email">
+            </div>
+            <div class="d-flex px-4 py-2">
+                <label class="pt-1" for="password">Mật khẩu</label>
+                <input class="rounded-3 border-0 px-3" type="password" placeholder="Nhập password">
+            </div>
+            <div class="text-center my-2 ms-5">
+                <input type="checkbox">
+                <label class="text-center" for="remember_login">
+                    Nhớ đăng nhập
+                </label>
+            </div>
+            <div>
+                <button class="btn-submit position-absolute btn btn-primary">Đăng nhập</button>
+            </div>
+        </form>
     </div>
 </template>
 <script>
@@ -27,26 +28,29 @@
     }
 </script>
 <style>
-    .tien {
-      background-color: #606468;
-      position: absolute;
-      width: 100vw;
-      background-repeat: no-repeat;
+    .container {
+        height: 100vh;
     }
-    .title {
-        padding: 20px 0 50px 0;
-    }
-    .form-login {
+
+    .form {
         width: 400px;
         height: 400px;
-        margin: 5% auto 15% auto;
-        border-radius: 20px;
+        background-color: bisque;
     }
 
     input {
-        border-radius: 10px;
-        border: 1px solid #bdbdbd;
+        flex: 1;
         outline: none;
-        padding: 0 15px;
+       
+    }
+
+    label {
+        min-width: 130px;
+        height: 35px;
+    }
+
+    .btn-submit {
+        width: 150px;
+        left: 45%;
     }
 </style>
