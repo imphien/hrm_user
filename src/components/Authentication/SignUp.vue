@@ -1,25 +1,25 @@
 <template>
     <div class="container d-flex justify-content-center align-items-center">
-        <form class="form d-flex flex-column rounded-4">
-            <h1 class="text-center pt-4 pb-4">Đăng nhập</h1>
-            <div class="d-flex px-4 py-2">
-                <label class="pt-1" for="email">Tên đăng nhập</label>
-                <input class="rounded-3 border-0 px-3" type="text" placeholder="Nhập email">
+        <div>
+            <form class="form d-flex flex-column rounded-4 px-5">
+            <h1 class="text-center py-5">Đăng nhập</h1>
+            <div class="form-input text-center mb-3">
+                <input class="py-2 px-3 rounded-2" type="text" placeholder="Email">
             </div>
-            <div class="d-flex px-4 py-2">
-                <label class="pt-1" for="password">Mật khẩu</label>
-                <input class="rounded-3 border-0 px-3" type="password" placeholder="Nhập password">
+            <div class="form-input text-center mb-3">
+                <input class="py-2 px-3 rounded-2" type="password" placeholder="Mật khẩu">
             </div>
-            <div class="text-center my-2 ms-5">
-                <input type="checkbox">
-                <label class="text-center" for="remember_login">
-                    Nhớ đăng nhập
-                </label>
+            <div class="d-flex flex-row-reverse mb-3">
+                <a class="text-decoration-none text-reset" href="#">Quên mật khẩu</a>
             </div>
-            <div>
-                <button class="btn-submit position-absolute btn btn-primary">Đăng nhập</button>
+            <div class="text-center px-5 mb-3">
+                <button class="rounded-5 btn btn-dark">Đăng nhập</button>
+            </div>
+            <div class="text-center p-5">
+                <p>Make by I'm Phiến</p>
             </div>
         </form>
+        </div>
     </div>
 </template>
 <script>
@@ -33,24 +33,32 @@
     }
 
     .form {
-        width: 400px;
-        height: 400px;
-        background-color: bisque;
+        background: white;
+        width: 520px;
+    }
+
+    .form-input {
+        width: 100%;
     }
 
     input {
-        flex: 1;
-        outline: none;
-       
+        width: 100%;
+        background-color: #f4f5f7;
+        border: 1px solid #f4f5f7;
+        color: black;
+        line-height: 20px;
     }
 
-    label {
-        min-width: 130px;
-        height: 35px;
+    input:hover {
+        border: 1px solid #f4f5f7;
     }
 
-    .btn-submit {
-        width: 150px;
-        left: 45%;
+    button {
+        height: 50px;
+        width: 100%;
+    }
+    
+    p {
+        width: 100%;
     }
 </style>
