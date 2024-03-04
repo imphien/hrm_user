@@ -4,12 +4,12 @@
             <form class="form d-flex flex-column rounded-4 px-5">
                 <h1 class="text-center py-5">Đăng nhập</h1>
                 <div class="form-input-auth text-center mb-3 position-relative">
-                    <input class="form-input pt-4 pb-2 px-3 rounded-2" type="text">
-                    <label class="form-input-label">Email</label>
+                    <input class="form-input pt-4 pb-2 px-3 rounded-2" type="text" v-model="activeClass">
+                    <label class="form-input-label" :class="'active'">Email</label>
                 </div>
                 <div class="form-input-auth text-center mb-3 position-relative">
                     <input class="form-input pt-4 pb-2  px-3 rounded-2" type="password">
-                    <label class="form-input-label">Mật khẩu</label>
+                    <label class="form-input-label" :class="activeClass">Mật khẩu</label>
                 </div>
                 <div class="d-flex flex-row-reverse mb-3">
                     <a class="text-decoration-none text-reset" href="#">Quên mật khẩu</a>
@@ -24,14 +24,17 @@
         </div>
     </div>
 </template>
-<script>
-    export default {
-        name: 'SignUp'
-    }
+<script setup>{
+    const { ref, computed } = Vue;
 
-
+    const dataInput = ref('');
+    
+    const activeClass = computed(() => {
+      return dataInput.value ? 'active' : '';
+    });
+  }
 </script>
-<style>
+<style scoped>
     .container {
         height: 100vh;
     }
@@ -41,7 +44,7 @@
         width: 520px;
     }
 
-    .form-input-auth {
+.form-input-auth {
         width: 100%;
     }
 
@@ -58,15 +61,16 @@
         left: 17px;
         top: 16px;
         font-size: 17px;
-        transition: 2s;
+        transition: 0.5s;
     }
 
-    .form-input:valid ~ .form-input-label
-    .form-input:focus ~ .form-input-label
-
-    /* .form-input:not([value=""]) ~ .form-input-label{
-        font-size: 50px;
-    } */
+    .form-input-label.active {
+        position: absolute;
+        left: 17px;
+        top: 16px;
+        font-size: 17px;
+        transition: 0.5s;
+    }
 
     input:hover {
         border: 1px solid #f4f5f7;
