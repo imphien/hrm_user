@@ -30,6 +30,7 @@
 
     import { ref, computed } from 'vue';
     import axios from 'axios';
+    import router from '@/router';
 
     const dataInputEmail = ref('');
     const dataInputPassword = ref('');
@@ -53,6 +54,7 @@
                 }
             )
             localStorage.setItem('token', response.data.data.access_token)
+            router.push('/users')
         } catch (err) {
             errorMessage.value = err.response.data.errors;
         }
