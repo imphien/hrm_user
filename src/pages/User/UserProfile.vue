@@ -1,5 +1,5 @@
 <template>
-    Alo
+  a
 </template>
 <script>
 </script>
