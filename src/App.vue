@@ -2,7 +2,18 @@
   <router-view></router-view>
 </template>
 
-<script>
+<script setup>
+    import { onMounted } from 'vue';
+    import router from "@/router";
+
+    onMounted(() => {
+      console.log(router)
+      const token = localStorage.getItem('token');
+
+      if (!token) {
+        router.push('/login')
+      }
+    })
 </script>
 
 <style>
