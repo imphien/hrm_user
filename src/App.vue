@@ -1,19 +1,23 @@
 <template>
-  <SignUp></SignUp>
+  <router-view></router-view>
 </template>
 
-<script>
-import SignUp from './components/Authentication/SignUp.vue';
-export default {
-  name: 'App',
-  components: {
-    SignUp
-  }
-}
+<script setup>
+    import { onMounted } from 'vue';
+    import router from "@/router";
+
+    onMounted(() => {
+      console.log(router)
+      const token = localStorage.getItem('token');
+
+      if (!token) {
+        router.push('/login')
+      }
+    })
 </script>
 
 <style>
-#app {
-  height: 100vh;
-}
+  body {
+    background: #f7f8f8 !important;
+  }
 </style>
