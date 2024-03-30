@@ -7,7 +7,7 @@
     import router from "@/router";
 
     onMounted(() => {
-      console.log(router)
+      localStorage.removeItem('token');
       const token = localStorage.getItem('token');
 
       if (!token) {
