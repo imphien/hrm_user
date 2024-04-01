@@ -32,10 +32,7 @@
     </div>
 </template>
 <style>
-    .sidebar {
-        height: calc(100vh - 110px);
-        top: 110px;
-        position: fixed;
-        overflow: auto;
-    }
+  .sidebar {
+    height: calc(100vh - 114px);
+  }
 </style>

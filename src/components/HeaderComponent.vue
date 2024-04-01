@@ -4,7 +4,7 @@
             <div class="container-image col-9 px-0 border border-5 border-dark">
                 <img class="img-header" src="../assets/images-2.jpeg">
             </div>
-            <div class="col-3 d-flex bg-white">
+            <div class="col-3 d-flex bg-white border border-dark">
                 <img class="img-user" src="../assets/images-2.png">
                 <div class="ps-5">
                     <div class="py-2">
@@ -13,7 +13,7 @@
                     </div>
                     <div>
                         <a href="#">Đổi mật khẩu</a>
-                        <a class="ps-5" href="#">Đăng xuất</a>
+                        <a class="ps-3" href="#">Đăng xuất</a>
                     </div>
                 </div>
             </div>
@@ -33,7 +33,7 @@
     }
 
     .img-header {
-        height: 100px;
+        height: 104px;
         width: 100%;
     }
 </style>
