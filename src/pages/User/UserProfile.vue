@@ -28,7 +28,7 @@
         </div>
       </div>
       <div class="col-3">
-        <button class="btn btn-primary btn-lg" @click="showCreateUser = true"> Thêm mới </button>
+        <button class="btn btn-primary btn-lg" @click="showCreateUser()"> Thêm mới </button>
       </div>
     </div>
     <div class="pt-5">
@@ -57,7 +57,7 @@
           <td>{{ user.roles.length > 0 ? user.roles[0].name : '' }}</td>
           <td>Hoạt động</td>
           <td class="d-flex justify-content-around">
-            <button class="btn btn-primary">Sửa</button>
+            <button class="btn btn-primary" @click="showUpdateUser(user)">Sửa</button>
             <button class="btn btn-danger" @click="deleteUser(user.id)">Xoá</button>
           </td>
         </tr>
@@ -65,10 +65,10 @@
       </table>
     </div>
   </div>
-  <template v-if="showCreateUser">
-      <CreateUser>
-      </CreateUser>
-  </template>
+  <CreateUser v-if="isShowCreateUser" @hide="hideCreateUser">
+  </CreateUser>
+  <UpdateUser v-if="isShowUpdateUser" :user="userDetail" @hide="hideUpdateUser">
+  </UpdateUser>
 </template>
 <script setup>
   import axios from "axios";
@@ -76,6 +76,7 @@
   import qs from "qs";
 
   import CreateUser from './CreateUser';
+  import UpdateUser from './UpdateUser';
 
   const errorMessage = ref({});
   const users = ref([]);
@@ -83,7 +84,9 @@
   const selectRole = ref('');
   const userId = ref('');
   const userFullName = ref('');
-  const showCreateUser = ref(false);
+  const isShowCreateUser = ref(false);
+  const isShowUpdateUser = ref(false);
+  const userDetail = ref({});
 
   const getListUsers = async () => {
     try {
@@ -138,6 +141,23 @@
     } catch (err) {
       errorMessage.value = err.response.data.errors;
     }
+  }
+
+  const showCreateUser = () => {
+    isShowCreateUser.value = true
+  }
+
+  const hideCreateUser = () => {
+    isShowCreateUser.value = false
+  }
+
+  const showUpdateUser = (user) => {
+    userDetail.value = user
+    isShowUpdateUser.value = true
+  }
+
+  const hideUpdateUser = () => {
+    isShowUpdateUser.value = false
   }
 
   onMounted(() => {
