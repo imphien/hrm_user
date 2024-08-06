@@ -1,12 +1,15 @@
 services:
-  hrm_web:
-    container_name: hrm_web
-    build: .
+  app:
+    build:
+      context: .
+    restart: unless-stopped
     ports:
-      - '2000:2000'
+      - '${DOCKER_NGINX_PORT-4000}:2000'
+    volumes:
+      - './nginx.conf:/etc/nginx/conf.d/default.conf'
     networks:
       - frontend
 
 networks:
   frontend:
-    name: hrm_frontend_network
+    driver: bridge
