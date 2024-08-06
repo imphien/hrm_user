@@ -1,0 +1,12 @@
+services:
+  hrm_web:
+    container_name: hrm_web
+    build: .
+    ports:
+      - '2000:2000'
+    networks:
+      - frontend
+
+networks:
+  frontend:
+    name: hrm_frontend_network
