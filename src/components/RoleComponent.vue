@@ -9,6 +9,7 @@
 <script setup>
 import axios from "axios";
 import {onMounted, ref} from "vue";
+import {config} from "@/Common/app.config.ts";
 
 // eslint-disable-next-line no-undef
 const props = defineProps(['title']);
@@ -18,7 +19,7 @@ const errorMessage = ref('');
 const getListRoles = async () => {
   try {
     const response = await axios.get(
-        `http://127.0.0.1:8000/api/roles`,
+        config.apiUrl + `/roles`,
     )
     roles.value = response.data.data
   } catch (err) {

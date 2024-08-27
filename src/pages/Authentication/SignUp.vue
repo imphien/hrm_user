@@ -31,6 +31,7 @@
     import { ref, computed } from 'vue';
     import axios from 'axios';
     import router from '@/router';
+    import {config} from "@/Common/app.config.ts";
 
     const dataInputEmail = ref('');
     const dataInputPassword = ref('');
@@ -47,7 +48,7 @@
     const login = async () => {
         try {
             const response = await axios.post(
-                `http://127.0.0.1:8000/api/login`,
+                config.apiUrl,
                 {
                     email: dataInputEmail.value,
                     password: dataInputPassword.value,

@@ -30,6 +30,7 @@
 import InputComponent from '@/components/InputComponent.vue'
 import axios from "axios";
 import {ref} from "vue";
+import {config} from "@/Common/app.config.ts";
 
 // eslint-disable-next-line no-undef
 defineEmits(['isShow'])
@@ -54,7 +55,7 @@ const errorMessage = ref('');
 const updateUser = async (userId) => {
   try {
     await axios.put(
-        `http://127.0.0.1:8000/api/users/${userId}`, userInfo.value
+        `${config.apiUrl}users/${userId}`, userInfo.value
     )
     location.reload();
   } catch (err) {

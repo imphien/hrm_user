@@ -77,6 +77,7 @@
 
   import CreateUser from './CreateUser';
   import UpdateUser from './UpdateUser';
+  import {config} from "@/Common/app.config.ts";
 
   const errorMessage = ref({});
   const users = ref([]);
@@ -91,7 +92,7 @@
   const getListUsers = async () => {
     try {
        const response = await axios.get(
-          `http://127.0.0.1:8000/api/users`,
+          `${config.apiUrl}users`,
       )
       users.value = response.data;
     } catch (err) {
@@ -102,7 +103,7 @@
   const getListRoles = async () => {
     try {
       const response = await axios.get(
-          `http://127.0.0.1:8000/api/roles`,
+          `${config.apiUrl}roles`,
       )
       roles.value = response.data.data
     } catch (err) {
@@ -124,7 +125,7 @@
       }
       const queryString = qs.stringify(params);
       const response = await axios.get(
-          `http://127.0.0.1:8000/api/users?${queryString}`,
+          `${config.apiUrl}users?${queryString}`,
       )
       users.value = response.data;
     } catch (err) {
@@ -135,7 +136,7 @@
   const deleteUser = async (userId) => {
     try {
       await axios.delete(
-          `http://127.0.0.1:8000/api/users/${userId}`,
+          `${config.apiUrl}users/${userId}`,
       )
       location.reload();
     } catch (err) {

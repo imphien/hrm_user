@@ -32,6 +32,7 @@
   import RoleComponent from '@/components/RoleComponent'
   import axios from "axios";
   import {ref} from "vue";
+  import {config} from "@/Common/app.config.ts";
 
   // eslint-disable-next-line no-undef
   defineEmits(['isShow'])
@@ -54,7 +55,7 @@
     console.log('a', userInfo.value)
     try {
       await axios.post(
-          `http://127.0.0.1:8000/api/users`, userInfo.value
+          config.apiUrl, userInfo.value
       )
       location.reload();
     } catch (err) {
