@@ -47,20 +47,20 @@
         </tr>
         </thead>
         <tbody>
-        <tr class="text-center" v-for="user in users" :key="user.id">
-          <th scope="row">{{ user.id }}</th>
-          <td>{{ user.full_name }}</td>
-          <td>{{ user.phone }}</td>
-          <td>{{ user.birthday }}</td>
-          <td>Nam</td>
-          <td>{{ user.email }}</td>
-          <td>{{ user.roles.length > 0 ? user.roles[0].name : '' }}</td>
-          <td>Hoạt động</td>
-          <td class="d-flex justify-content-around">
-            <button class="btn btn-primary" @click="showUpdateUser(user)">Sửa</button>
-            <button class="btn btn-danger" @click="deleteUser(user.id)">Xoá</button>
-          </td>
-        </tr>
+          <tr class="text-center" v-for="user in users" :key="user.id">
+            <th scope="row">{{ user.id }}</th>
+            <td>{{ user.full_name }}</td>
+            <td>{{ user.phone }}</td>
+            <td>{{ user.birthday }}</td>
+            <td>Nam</td>
+            <td>{{ user.email }}</td>
+            <td>{{ user.roles.length > 0 ? user.roles[0].name : '' }}</td>
+            <td>Hoạt động</td>
+            <td class="d-flex justify-content-around">
+              <button class="btn btn-primary" @click="showUpdateUser(user)">Sửa</button>
+              <button class="btn btn-danger" @click="deleteUser(user.id)">Xoá</button>
+            </td>
+          </tr>
         </tbody>
       </table>
     </div>

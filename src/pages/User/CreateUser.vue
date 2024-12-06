@@ -52,7 +52,6 @@
 
   const createUser = async () => {
     userInfo.value.password = userInfo.value.username + userInfo.value.phone;
-    console.log('a', userInfo.value)
     try {
       await axios.post(
           config.apiUrl, userInfo.value

@@ -48,7 +48,7 @@
     const login = async () => {
         try {
             const response = await axios.post(
-                config.apiUrl,
+                config.apiUrl + `login`,
                 {
                     email: dataInputEmail.value,
                     password: dataInputPassword.value,

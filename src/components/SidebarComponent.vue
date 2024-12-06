@@ -2,31 +2,19 @@
     <div class="sidebar col-2 pt-4 px-3 bg-white">
         <ul class="list-group">
             <li class="list-group-item">
-                <a>Tuyển dụng</a>
+              <router-link :to="{ name: 'recruitments' }" class="text-decoration-none text-dark">Tuyển dụng</router-link>
             </li>
             <li class="list-group-item">
-                <a>Thông báo</a>
+              <router-link :to="{ name: 'notifications' }" class="text-decoration-none text-dark">Thông báo</router-link>
             </li>
             <li class="list-group-item">
-                <a>Đơn từ</a>
+              <router-link :to="{ name: 'approvals' }" class="text-decoration-none text-dark">Đơn từ</router-link>
             </li>
             <li class="list-group-item">
-                <a>Chấm công</a>
+              <router-link :to="{ name: 'timekeeping' }" class="text-decoration-none text-dark">Chấm công</router-link>
             </li>
             <li class="list-group-item">
-                <a>Lương</a>
-            </li>
-            <li class="list-group-item">
-                <a>Báo cáo</a>
-            </li>
-            <li class="list-group-item">
-                <a>Quản lý tài khoản</a>
-            </li>
-            <li class="list-group-item">
-                <a>Phân quyền</a>
-            </li>
-            <li class="list-group-item">
-                <a>Cấu hình</a>
+              <router-link :to="{ name: 'salaries' }" class="text-decoration-none text-dark">Lương</router-link>
             </li>
         </ul>
     </div>

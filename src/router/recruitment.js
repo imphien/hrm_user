@@ -3,7 +3,7 @@ import Recruitment from '../pages/Recruitment/ListRecruitment.vue'
 export default [
     {
         path: '/recruitments',
-        name: 'users',
+        name: 'recruitments',
         component: Recruitment,
         meta: {
             auth: true,
