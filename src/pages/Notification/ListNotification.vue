@@ -9,11 +9,20 @@
           <div class="d-flex justify-content-around">
             <div class="d-flex">
               <span class="input-title fw-medium">Từ ngày</span>
-              <input type="text" class="px-2" v-model="startDate">
+              <Datepicker
+                  v-model="startDate"
+                  placeholder="Chọn ngày bắt đầu"
+                  class="p-2"
+              />
             </div>
             <div class="d-flex">
               <span class="input-title fw-medium">Đến ngày</span>
-              <input type="text" class="px-2" v-model="endDate">
+              <Datepicker
+                  v-model="endDate"
+                  placeholder="Chọn ngày bắt đầu"
+                  :format="(date) => date.toLocaleDateString()"
+                  class="p-2"
+              />
             </div>
             <div>
               <button class="btn btn-dark" @click="getListNotifications">
@@ -57,6 +66,7 @@ import axios from "axios";
 import {config} from "@/Common/app.config.ts";
 import qs from "qs";
 import CreateNotification from "@/pages/Notification/CreateNotification";
+import Datepicker from "vue3-datepicker";
 
 const startDate = ref('');
 const endDate = ref('');

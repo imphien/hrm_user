@@ -46,19 +46,37 @@
     });
 
     const login = async () => {
-        try {
-            const response = await axios.post(
-                config.apiUrl + `login`,
-                {
-                    email: dataInputEmail.value,
-                    password: dataInputPassword.value,
-                }
-            )
-            localStorage.setItem('token', response.data.data.access_token)
-            router.push('/users')
-        } catch (err) {
-            errorMessage.value = err.response.data.errors;
-        }
+      try {
+        const response = await axios.post(
+            config.apiUrl + `login`,
+            {
+              email: dataInputEmail.value,
+              password: dataInputPassword.value,
+            }
+        )
+        localStorage.setItem('token', response.data.data.access_token)
+        await getCurrentUser()
+        await router.push('/users')
+      } catch (err) {
+        errorMessage.value = err.response.data.errors;
+      }
+    }
+
+    const getCurrentUser = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        const response = await axios.get(
+            config.apiUrl + `users/who-am-i`, {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+        )
+
+        localStorage.setItem('currentUser', JSON.stringify(response.data.data))
+      } catch (err) {
+        errorMessage.value = err.response.data.errors;
+      }
     }
 
 </script>

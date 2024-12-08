@@ -8,15 +8,24 @@
         <div class="d-flex justify-content-around">
           <div class="d-flex">
             <span class="input-title fw-medium">Từ ngày</span>
-            <input type="text" class="px-2" v-model="startDate">
+            <Datepicker
+                v-model="startDate"
+                placeholder="Chọn ngày bắt đầu"
+                class="p-2"
+            />
           </div>
           <div class="d-flex">
             <span class="input-title fw-medium">Đến ngày</span>
-            <input type="text" class="px-2" v-model="endDate">
+            <Datepicker
+                v-model="endDate"
+                placeholder="Chọn ngày bắt đầu"
+                :format="(date) => date.toLocaleDateString()"
+                class="p-2"
+            />
           </div>
           <div class="d-flex">
             <span class="input-title fw-medium">Mã nhân viên</span>
-            <input type="text" class="px-2" v-model="endDate">
+            <input type="text" class="px-2" v-model="userId">
           </div>
         </div>
         <div class="d-flex justify-content-around pt-3">
@@ -29,7 +38,7 @@
           <div class="d-flex">
             <span class="input-title fw-medium">Loại đơn</span>
             <select class="type-selected form-select" id="type" name="type" v-model="selectType">
-              <option v-for="type in types" :value="type.id" :key="type.id">{{ selectType }}</option>
+              <option v-for="type in types" :value="type.id" :key="type.id">{{ type }}</option>
             </select>
           </div>
           <button class="btn btn-dark" @click="getListApprovals">
@@ -77,9 +86,11 @@ import {onMounted, ref} from "vue";
 import axios from "axios";
 import {config} from "@/Common/app.config.ts";
 import qs from "qs";
+import Datepicker from "vue3-datepicker";
 
 const startDate = ref('');
 const endDate = ref('');
+const userId = ref('');
 const selectStatus = ref('');
 const selectType = ref('');
 const approvals = ref([]);

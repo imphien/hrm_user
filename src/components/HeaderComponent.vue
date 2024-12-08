@@ -8,18 +8,56 @@
                 <img class="img-user" src="../assets/images-2.png">
                 <div class="ps-5">
                     <div class="py-2">
-                        <div>Nguyen Van A</div>
+                        <div>{{ currentUser.full_name }}</div>
                         <div>Quan tri he thong</div>
                     </div>
                     <div>
                         <a href="#">Đổi mật khẩu</a>
-                        <a class="ps-3" href="#">Đăng xuất</a>
+                        <a class="ps-3" href="#" @click="logout">Đăng xuất</a>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </template>
+<script setup>
+import {onMounted, ref} from "vue";
+import axios from "axios";
+import {config} from "@/Common/app.config.ts";
+import router from "@/router";
+
+const currentUser = ref({});
+const errorMessage = ref({});
+
+onMounted(() => {
+  getCurrentUser();
+})
+
+const getCurrentUser = () => {
+  const storedUser = localStorage.getItem('currentUser');
+  currentUser.value = JSON.parse(storedUser);
+}
+
+const logout = async () => {
+  try {
+    const token = localStorage.getItem('token');
+    await axios.post(
+        config.apiUrl + `logout`, {}, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+    )
+
+    localStorage.setItem('currentUser', null)
+    localStorage.setItem('token', null)
+
+    await router.push('/login')
+  } catch (err) {
+    errorMessage.value = err.response.data.errors;
+  }
+}
+</script>
 <style scoped>
     .header-body {
         height: 100px;

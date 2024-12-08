@@ -8,7 +8,11 @@
         <div class="d-flex justify-content-around">
           <div class="d-flex">
             <span class="input-title fw-medium">Tháng</span>
-            <input type="text" class="px-2" v-model="month">
+            <Datepicker
+                v-model="month"
+                placeholder="Chọn ngày bắt đầu"
+                class="p-2"
+            />
           </div>
           <div class="d-flex">
             <span class="input-title fw-medium">Họ và tên</span>
@@ -52,7 +56,7 @@
           <td>{{ item.type }}</td>
           <td>{{ item.hours }}</td>
           <td class="d-flex justify-content-around">
-            <button class="btn btn-danger" @click="showUpdateTimekeeping(item)">Sửa</button>
+            <button class="btn btn-danger" @click="showUpdateTimekeeping(item)">Chi tiết</button>
           </td>
         </tr>
         </tbody>
@@ -71,8 +75,9 @@ import {config} from "@/Common/app.config.ts";
 import qs from "qs";
 import UpdateTimekeeping from "@/pages/Timekeeping/UpdateTimekeeping";
 import CreateTimekeeping from "@/pages/Timekeeping/CreateTimekeeping";
+import Datepicker from "vue3-datepicker";
 
-const month = ref('');
+const month = ref(null);
 const fullName = ref('');
 const userId = ref('');
 const timekeeping = ref([]);
