@@ -32,13 +32,13 @@
           <div class="d-flex">
             <span class="input-title fw-medium">Trạng thái</span>
             <select class="status-selected form-select" id="status" name="status" v-model="selectStatus">
-              <option v-for="statusValue in status" :value="statusValue.id" :key="statusValue.id">{{ statusValue }}</option>
+              <option v-for="(statusName, statusId) in status" :value="statusId" :key="statusId">{{ statusName }}</option>
             </select>
           </div>
           <div class="d-flex">
             <span class="input-title fw-medium">Loại đơn</span>
-            <select class="type-selected form-select" id="type" name="type" v-model="selectType">
-              <option v-for="type in types" :value="type.id" :key="type.id">{{ type }}</option>
+            <select class="status-selected form-select" id="status" name="status" v-model="selectType">
+              <option v-for="(typeName, typeId) in types" :value="typeId" :key="typeId">{{ typeName }}</option>
             </select>
           </div>
           <button class="btn btn-dark" @click="getListApprovals">
@@ -46,7 +46,7 @@
           </button>
         </div>
       </div>
-      <div class="col-3" @click="showCreateRecruitment">
+      <div class="col-3" @click="showCreateApproval">
         <button class="btn btn-primary btn-lg"> Thêm mới </button>
       </div>
     </div>
@@ -80,13 +80,13 @@
       </table>
     </div>
   </div>
+  <CreateApproval v-if="isShowCreateApproval" @hide="hideCreateApproval" />
 </template>
 <script setup>
 import {onMounted, ref} from "vue";
-import axios from "axios";
-import {config} from "@/Common/app.config.ts";
-import qs from "qs";
 import Datepicker from "vue3-datepicker";
+import CreateApproval from "@/pages/Approval/CreateApproval";
+import api from "@/api";
 
 const startDate = ref('');
 const endDate = ref('');
@@ -105,6 +105,7 @@ const types = ref({
   2 : 'Đơn xin nghỉ việc',
   3 : 'Đơn chấm công',
 });
+const isShowCreateApproval = ref(false);
 
 const errorMessage = ref({});
 
@@ -114,28 +115,45 @@ onMounted(() => {
 
 const getListApprovals = async () => {
   try {
-    let params = {};
+    const params = {};
     if (selectStatus.value) {
       params.status = selectStatus.value;
-    }
-    if (startDate.value) {
-      params.start_date = startDate.value;
-    }
-    if (endDate.value) {
-      params.end_date = endDate.value;
     }
     if (selectType.value) {
       params.type = selectType.value;
     }
-    const queryString = qs.stringify(params);
-    const response = await axios.get(
-        `${config.apiUrl}approvals?${queryString}`,
-    )
+    if (userId.value) {
+      params.user_id = userId.value;
+    }
+
+    if (startDate.value instanceof Date) {
+      const adjustedDate = new Date(
+          startDate.value.getTime() + Math.abs(startDate.value.getTimezoneOffset() * 60000)
+      );
+      params.start_date = adjustedDate.toISOString().split("T")[0];
+    }
+
+    if (endDate.value instanceof Date) {
+      const adjustedDate = new Date(
+          endDate.value.getTime() + Math.abs(endDate.value.getTimezoneOffset() * 60000)
+      );
+      params.end_date = adjustedDate.toISOString().split("T")[0];
+    }
+
+    const response = await api.get('approvals', { params })
     approvals.value = response.data
   } catch (err) {
     errorMessage.value = err.response.data.errors;
   }
 }
+
+const hideCreateApproval = () => {
+  isShowCreateApproval.value = false;
+};
+
+const showCreateApproval = () => {
+  isShowCreateApproval.value = true;
+};
 </script>
 <style scoped>
 input:focus {

@@ -28,56 +28,44 @@
 </template>
 <script setup>
 
-    import { ref, computed } from 'vue';
-    import axios from 'axios';
-    import router from '@/router';
-    import {config} from "@/Common/app.config.ts";
+import {ref, computed} from 'vue';
+import router from '@/router';
+import api from "@/api";
 
-    const dataInputEmail = ref('');
-    const dataInputPassword = ref('');
-    const errorMessage = ref({});
-    
-    const activeClassEmail = computed(() => {
-      return dataInputEmail.value ? 'active' : '';
+const dataInputEmail = ref('');
+const dataInputPassword = ref('');
+const errorMessage = ref({});
+
+const activeClassEmail = computed(() => {
+  return dataInputEmail.value ? 'active' : '';
+});
+
+const activeClassPassword = computed(() => {
+  return dataInputPassword.value ? 'active' : '';
+});
+
+const login = async () => {
+  try {
+    const response = await api.post('login', {
+      email: dataInputEmail.value,
+      password: dataInputPassword.value,
     });
+    localStorage.setItem('token', response.data.data.access_token)
+    await getCurrentUser()
+    await router.push('/users')
+  } catch (err) {
+    errorMessage.value = err.response.data.errors;
+  }
+}
 
-    const activeClassPassword = computed(() => {
-      return dataInputPassword.value ? 'active' : '';
-    });
-
-    const login = async () => {
-      try {
-        const response = await axios.post(
-            config.apiUrl + `login`,
-            {
-              email: dataInputEmail.value,
-              password: dataInputPassword.value,
-            }
-        )
-        localStorage.setItem('token', response.data.data.access_token)
-        await getCurrentUser()
-        await router.push('/users')
-      } catch (err) {
-        errorMessage.value = err.response.data.errors;
-      }
-    }
-
-    const getCurrentUser = async () => {
-      try {
-        const token = localStorage.getItem('token');
-        const response = await axios.get(
-            config.apiUrl + `users/who-am-i`, {
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
-            }
-        )
-
-        localStorage.setItem('currentUser', JSON.stringify(response.data.data))
-      } catch (err) {
-        errorMessage.value = err.response.data.errors;
-      }
-    }
+const getCurrentUser = async () => {
+  try {
+    const response = await api.get('users/who-am-i');
+    localStorage.setItem('currentUser', JSON.stringify(response.data.data))
+  } catch (err) {
+    errorMessage.value = err.response.data.errors;
+  }
+}
 
 </script>
 <style scoped>

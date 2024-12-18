@@ -1,7 +1,7 @@
 <template>
   <div class="sidebar col-2 pt-4 px-3 bg-white">
     <ul class="list-group">
-      <li class="list-group-item">
+      <li v-if="!checkCurrentUser()" class="list-group-item">
         <router-link :to="{ name: 'recruitments' }" class="text-decoration-none text-dark">Tuyển dụng</router-link>
       </li>
       <li class="list-group-item">
@@ -13,15 +13,29 @@
       <li class="list-group-item">
         <router-link :to="{ name: 'timekeeping' }" class="text-decoration-none text-dark">Chấm công</router-link>
       </li>
-      <li class="list-group-item">
+      <li v-if="!checkCurrentUser()" class="list-group-item">
         <router-link :to="{ name: 'salaries' }" class="text-decoration-none text-dark">Lương</router-link>
       </li>
-      <li class="list-group-item">
+      <li v-if="!checkCurrentUser()" class="list-group-item">
         <router-link :to="{ name: 'users' }" class="text-decoration-none text-dark">Quản lý tài khoản</router-link>
       </li>
     </ul>
   </div>
 </template>
+<script setup>
+import {onMounted} from "vue";
+
+onMounted(() => {
+  checkCurrentUser();
+})
+
+const checkCurrentUser = () => {
+  const currentUser = localStorage.getItem('currentUser');
+  const userObject = JSON.parse(currentUser);
+
+  return userObject.roles.some(role => role.name === 'staff');
+}
+</script>
 <style>
   .sidebar {
     height: calc(100vh - 114px);

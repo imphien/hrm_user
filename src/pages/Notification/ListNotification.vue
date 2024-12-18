@@ -20,7 +20,6 @@
               <Datepicker
                   v-model="endDate"
                   placeholder="Chọn ngày bắt đầu"
-                  :format="(date) => date.toLocaleDateString()"
                   class="p-2"
               />
             </div>
@@ -62,11 +61,9 @@
 </template>
 <script setup>
 import {onMounted, ref} from "vue";
-import axios from "axios";
-import {config} from "@/Common/app.config.ts";
-import qs from "qs";
 import CreateNotification from "@/pages/Notification/CreateNotification";
 import Datepicker from "vue3-datepicker";
+import api from "@/api";
 
 const startDate = ref('');
 const endDate = ref('');
@@ -80,17 +77,14 @@ onMounted(() => {
 
 const getListNotifications = async () => {
   try {
-    let params = {};
+    const params = {};
     if (startDate.value) {
-      params.start_date = startDate.value;
+      params.start_date = formatDate(startDate.value);
     }
     if (endDate.value) {
-      params.end_date = endDate.value;
+      params.end_date = formatDate(endDate.value);
     }
-    const queryString = qs.stringify(params);
-    const response = await axios.get(
-        `${config.apiUrl}notifications?${queryString}`,
-    )
+    const response = await api.get('notifications', { params })
     notifications.value = response.data
   } catch (err) {
     errorMessage.value = err.response.data.errors;
@@ -103,6 +97,11 @@ const hideCreateNotification = () => {
 
 const showCreateNotification = () => {
   isShowCreateNotification.value = true
+}
+
+function formatDate(dateString) {
+  const date = new Date(dateString);
+  return new Intl.DateTimeFormat('en-CA').format(date);
 }
 </script>
 <style scoped>

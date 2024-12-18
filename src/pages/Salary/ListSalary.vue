@@ -24,7 +24,8 @@
             <button class="btn btn-dark me-5" @click="getListSalaries">
               <i class="fa-solid fa-magnifying-glass"></i> Tìm kiếm
             </button>
-            <i class="fa-solid fa-file-export fa-2x pt-1"></i>
+            <i class="fa-solid fa-file-import fa-2x pt-1" @click="triggerFileInput"></i>
+            <input type="file" ref="fileInput" @change="handleFileChange" style="display: none;" />
           </div>
         </div>
       </div>
@@ -80,6 +81,7 @@ const userId = ref('');
 const salaries = ref([]);
 const salaryDetail = ref({});
 const isShowUpdateSalary = ref(false);
+const fileInput = ref(null);
 
 const errorMessage = ref({});
 
@@ -116,6 +118,21 @@ const showUpdateSalary = (salary) => {
 
 const hideUpdateSalary = () => {
   isShowUpdateSalary.value = false
+}
+
+const triggerFileInput = () => {
+  fileInput.value.click();
+}
+
+const handleFileChange = async (event) => {
+  const file = event.target.files[0];
+
+  const formData = new FormData();
+  formData.append('file', file);
+
+  await axios.post(
+      config.apiUrl + `salaries/import`, formData
+  )
 }
 </script>
 <style scoped>

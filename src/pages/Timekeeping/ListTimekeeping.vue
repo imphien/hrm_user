@@ -7,7 +7,7 @@
       <div class="col-9">
         <div class="d-flex justify-content-around">
           <div class="d-flex">
-            <span class="input-title fw-medium">Tháng</span>
+            <span class="input-title fw-medium">Ngày</span>
             <Datepicker
                 v-model="month"
                 placeholder="Chọn ngày bắt đầu"

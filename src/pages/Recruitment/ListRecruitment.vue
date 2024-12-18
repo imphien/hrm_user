@@ -56,7 +56,7 @@
         <tbody>
         <tr class="text-center" v-for="recruitment in recruitments" :key="recruitment.id">
           <th scope="row">{{ recruitment.id }}</th>
-          <td>{{ recruitment.position }}</td>
+          <td>{{ recruitment.role.name }}</td>
           <td>{{ recruitment.quantity }}</td>
           <td>{{ recruitment.content }}</td>
           <td>{{ recruitment.requirement }}</td>
@@ -78,12 +78,10 @@
 </template>
 <script setup>
 import {onMounted, ref} from "vue";
-import axios from "axios";
-import {config} from "@/Common/app.config.ts";
-import qs from "qs";
 import UpdateRecruitment from "@/pages/Recruitment/UpdateRecruitment";
 import CreateRecruitment from "@/pages/Recruitment/CreateRecruitment";
 import Datepicker from "vue3-datepicker";
+import api from "@/api";
 
 const startDate = ref('');
 const endDate = ref('');
@@ -107,7 +105,7 @@ function formatDate(dateString) {
 
 const getListRecruitments = async () => {
   try {
-    let params = {};
+    const params = {};
     if (selectRole.value) {
       params.role_id = selectRole.value;
     }
@@ -118,10 +116,7 @@ const getListRecruitments = async () => {
       params.end_date = formatDate(endDate.value);
     }
 
-    const queryString = qs.stringify(params);
-    const response = await axios.get(
-        `${config.apiUrl}recruitments?${queryString}`
-    );
+    const response = await api.get('recruitments', { params });
     recruitments.value = response.data;
   } catch (err) {
     errorMessage.value = err.response?.data.errors;
@@ -130,7 +125,7 @@ const getListRecruitments = async () => {
 
 const getListRoles = async () => {
   try {
-    const response = await axios.get(`${config.apiUrl}roles`);
+    const response = await api.get('roles');
     roles.value = response.data.data;
   } catch (err) {
     errorMessage.value = err.response?.data.errors;
