@@ -3,16 +3,16 @@
 </template>
 
 <script setup>
-    import { onMounted } from 'vue';
-    import router from "@/router";
+import {onMounted} from 'vue';
+import router from "@/router";
 
-    onMounted(() => {
-      const token = localStorage.getItem('token');
+onMounted(() => {
+  const token = localStorage.getItem('token');
 
-      if (!token) {
-        router.push('/login')
-      }
-    })
+  if (!token) {
+    router.push('/login')
+  }
+})
 </script>
 
 <style>

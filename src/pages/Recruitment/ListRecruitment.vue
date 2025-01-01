@@ -12,15 +12,17 @@
                 v-model="startDate"
                 placeholder="Chọn ngày bắt đầu"
                 class="p-2"
+                :clearable="true"
             />
           </div>
           <div class="d-flex">
             <span class="input-title fw-medium">Đến ngày</span>
             <Datepicker
                 v-model="endDate"
-                placeholder="Chọn ngày bắt đầu"
+                placeholder="Chọn ngày kết thúc"
                 :format="(date) => date.toLocaleDateString()"
                 class="p-2"
+                :clearable="true"
             />
           </div>
         </div>
@@ -28,6 +30,8 @@
           <div class="d-flex">
             <span class="input-title fw-medium">Vai trò</span>
             <select class="role-selected form-select" id="roles" name="roles" v-model="selectRole">
+              <option value="" disabled hidden>Chọn vai trò</option>
+              <option value="">Không chọn</option>
               <option v-for="role in roles" :value="role.id" :key="role.id">{{ role.name }}</option>
             </select>
           </div>
@@ -75,11 +79,13 @@
       :recruitment="recruitmentDetail"
       @hide="hideUpdateRecruitment"
   />
+  <LoadingComponent :visible="loading" />
 </template>
 <script setup>
 import {onMounted, ref} from "vue";
 import UpdateRecruitment from "@/pages/Recruitment/UpdateRecruitment";
 import CreateRecruitment from "@/pages/Recruitment/CreateRecruitment";
+import LoadingComponent from '@/components/LoadingComponent.vue';
 import Datepicker from "vue3-datepicker";
 import api from "@/api";
 
@@ -92,6 +98,7 @@ const errorMessage = ref({});
 const isShowUpdateRecruitment = ref(false);
 const isShowCreateRecruitment = ref(false);
 const recruitmentDetail = ref({});
+const loading = ref(false);
 
 onMounted(() => {
   getListRecruitments();
@@ -105,6 +112,7 @@ function formatDate(dateString) {
 
 const getListRecruitments = async () => {
   try {
+    loading.value = true;
     const params = {};
     if (selectRole.value) {
       params.role_id = selectRole.value;
@@ -120,15 +128,20 @@ const getListRecruitments = async () => {
     recruitments.value = response.data;
   } catch (err) {
     errorMessage.value = err.response?.data.errors;
+  } finally {
+    loading.value = false;
   }
 };
 
 const getListRoles = async () => {
   try {
+    loading.value = true;
     const response = await api.get('roles');
     roles.value = response.data.data;
   } catch (err) {
     errorMessage.value = err.response?.data.errors;
+  } finally {
+    loading.value = false;
   }
 };
 

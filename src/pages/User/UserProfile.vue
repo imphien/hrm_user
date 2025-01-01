@@ -71,13 +71,11 @@
   </UpdateUser>
 </template>
 <script setup>
-  import axios from "axios";
   import {onMounted, ref} from "vue";
-  import qs from "qs";
 
   import CreateUser from './CreateUser';
   import UpdateUser from './UpdateUser';
-  import {config} from "@/Common/app.config.ts";
+  import api from "@/api";
 
   const errorMessage = ref({});
   const users = ref([]);
@@ -91,9 +89,8 @@
 
   const getListUsers = async () => {
     try {
-       const response = await axios.get(
-          `${config.apiUrl}users`,
-      )
+      const response = await api.get('users')
+      
       users.value = response.data;
     } catch (err) {
       errorMessage.value = err.response.data.errors;
@@ -102,9 +99,7 @@
 
   const getListRoles = async () => {
     try {
-      const response = await axios.get(
-          `${config.apiUrl}roles`,
-      )
+      const response = await api.get('roles', {})
       roles.value = response.data.data
     } catch (err) {
       errorMessage.value = err.response.data.errors;
@@ -123,10 +118,8 @@
       if (userFullName.value) {
         params.full_name = userFullName.value;
       }
-      const queryString = qs.stringify(params);
-      const response = await axios.get(
-          `${config.apiUrl}users?${queryString}`,
-      )
+
+      const response = await api.get('users', params)
       users.value = response.data;
     } catch (err) {
       errorMessage.value = err.response.data.errors;
@@ -135,9 +128,7 @@
 
   const deleteUser = async (userId) => {
     try {
-      await axios.delete(
-          `${config.apiUrl}users/${userId}`,
-      )
+      await api.delete(`users/${userId}`,)
       location.reload();
     } catch (err) {
       errorMessage.value = err.response.data.errors;

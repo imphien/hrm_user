@@ -13,6 +13,7 @@
                   v-model="startDate"
                   placeholder="Chọn ngày bắt đầu"
                   class="p-2"
+                  :clearable="true"
               />
             </div>
             <div class="d-flex">
@@ -21,6 +22,7 @@
                   v-model="endDate"
                   placeholder="Chọn ngày bắt đầu"
                   class="p-2"
+                  :clearable="true"
               />
             </div>
             <div>
@@ -58,18 +60,21 @@
   </div>
   <CreateNotification v-if="isShowCreateNotification" @hide="hideCreateNotification">
   </CreateNotification>
+  <LoadingComponent :visible="loading" />
 </template>
 <script setup>
 import {onMounted, ref} from "vue";
 import CreateNotification from "@/pages/Notification/CreateNotification";
 import Datepicker from "vue3-datepicker";
 import api from "@/api";
+import LoadingComponent from '@/components/LoadingComponent.vue';
 
 const startDate = ref('');
 const endDate = ref('');
 const notifications = ref([]);
 const errorMessage = ref({});
 const isShowCreateNotification = ref(false);
+const loading = ref(false);
 
 onMounted(() => {
   getListNotifications();
@@ -77,6 +82,7 @@ onMounted(() => {
 
 const getListNotifications = async () => {
   try {
+    loading.value = true;
     const params = {};
     if (startDate.value) {
       params.start_date = formatDate(startDate.value);
@@ -88,6 +94,8 @@ const getListNotifications = async () => {
     notifications.value = response.data
   } catch (err) {
     errorMessage.value = err.response.data.errors;
+  } finally {
+    loading.value = false;
   }
 }
 

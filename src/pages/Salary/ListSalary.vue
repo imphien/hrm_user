@@ -72,8 +72,8 @@
 import {onMounted, ref} from "vue";
 import axios from "axios";
 import {config} from "@/Common/app.config.ts";
-import qs from "qs";
 import UpdateSalary from "@/pages/Salary/UpdateSalary";
+import api from "@/api";
 
 const month = ref('');
 const fullName = ref('');
@@ -101,10 +101,8 @@ const getListSalaries = async () => {
     if (userId.value) {
       params.user_id = userId.value;
     }
-    const queryString = qs.stringify(params);
-    const response = await axios.get(
-        `${config.apiUrl}salaries?${queryString}`,
-    )
+
+    const response = await api.get('salaries', { params })
     salaries.value = response.data
   } catch (err) {
     errorMessage.value = err.response.data.errors;

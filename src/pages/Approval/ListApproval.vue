@@ -12,6 +12,7 @@
                 v-model="startDate"
                 placeholder="Chọn ngày bắt đầu"
                 class="p-2"
+                :clearable="true"
             />
           </div>
           <div class="d-flex">
@@ -21,9 +22,10 @@
                 placeholder="Chọn ngày bắt đầu"
                 :format="(date) => date.toLocaleDateString()"
                 class="p-2"
+                :clearable="true"
             />
           </div>
-          <div class="d-flex">
+          <div v-if="isAdmin" class="d-flex">
             <span class="input-title fw-medium">Mã nhân viên</span>
             <input type="text" class="px-2" v-model="userId">
           </div>
@@ -55,25 +57,28 @@
         <thead>
         <tr class="text-center">
           <th scope="col">STT</th>
-          <th scope="col">Ngày bắt đầu</th>
-          <th scope="col">Ngày kết thúc</th>
           <th scope="col">Họ tên</th>
           <th scope="col">Loại đơn</th>
+          <th scope="col">Ngày bắt đầu</th>
+          <th scope="col">Ngày kết thúc</th>
           <th scope="col">Nội dung</th>
-          <th scope="col">Duyệt</th>
+          <th v-if="isAdmin" scope="col">Duyệt</th>
         </tr>
         </thead>
         <tbody>
         <tr class="text-center" v-for="approval in approvals" :key="approval.id">
           <th scope="row">{{ approval.id }}</th>
+          <td>{{ approval.user.full_name }}</td>
+          <td>{{ getNameType(approval.type) }}</td>
           <td>{{ approval.start_date }}</td>
           <td>{{ approval.end_date }}</td>
-          <td>{{ approval.user.full_name }}</td>
-          <td>{{ approval.type }}</td>
           <td>{{ approval.content }}</td>
-          <td class="d-flex justify-content-around">
-            <button class="btn btn-primary">Đồng ý</button>
-            <button class="btn btn-danger">Từ chối</button>
+          <td v-if="isAdmin && approval.status === 0" class="d-flex justify-content-around">
+            <button class="btn btn-primary" @click="updateApprovals(approval.id, 1)">Đồng ý</button>
+            <button class="btn btn-danger" @click="updateApprovals(approval.id, 2)">Từ chối</button>
+          </td>
+          <td v-if="!isAdmin || approval.status !== 0" class="d-flex justify-content-around fw-bold">
+            {{ getStatus(approval.status) }}
           </td>
         </tr>
         </tbody>
@@ -81,23 +86,26 @@
     </div>
   </div>
   <CreateApproval v-if="isShowCreateApproval" @hide="hideCreateApproval" />
+  <LoadingComponent :visible="loading" />
 </template>
 <script setup>
-import {onMounted, ref} from "vue";
+import {computed, onMounted, ref} from "vue";
 import Datepicker from "vue3-datepicker";
 import CreateApproval from "@/pages/Approval/CreateApproval";
 import api from "@/api";
+import LoadingComponent from '@/components/LoadingComponent.vue';
 
+const loading = ref(false);
 const startDate = ref('');
 const endDate = ref('');
 const userId = ref('');
 const selectStatus = ref('');
 const selectType = ref('');
 const approvals = ref([]);
-const status = ref({
+const listStatus = ref({
+  0 : 'Chưa phê duyệt',
   1 : 'Đã phê duyệt',
-  2 : 'Chưa phê duyệt',
-  3 : 'Từ chối',
+  2 : 'Từ chối',
 });
 
 const types = ref({
@@ -105,9 +113,15 @@ const types = ref({
   2 : 'Đơn xin nghỉ việc',
   3 : 'Đơn chấm công',
 });
+
 const isShowCreateApproval = ref(false);
 
 const errorMessage = ref({});
+
+const getCurrentUser = computed(() => {
+  const currentUser = localStorage.getItem('currentUser');
+  return JSON.parse(currentUser);
+});
 
 onMounted(() => {
   getListApprovals();
@@ -115,6 +129,7 @@ onMounted(() => {
 
 const getListApprovals = async () => {
   try {
+    loading.value = true;
     const params = {};
     if (selectStatus.value) {
       params.status = selectStatus.value;
@@ -139,12 +154,31 @@ const getListApprovals = async () => {
       );
       params.end_date = adjustedDate.toISOString().split("T")[0];
     }
+    if (isAdmin.value) {
+      const currentUser = getCurrentUser.value;
+      params.user_id = currentUser.id;
+    }
 
     const response = await api.get('approvals', { params })
     approvals.value = response.data
   } catch (err) {
     errorMessage.value = err.response.data.errors;
+  } finally {
+    loading.value = false;
   }
+}
+
+const updateApprovals = async (id, status) => {
+  try {
+    await api.put(`approvals/${id}`, { status: status })
+    location.reload()
+  } catch (err) {
+    errorMessage.value = err.response.data.errors;
+  }
+}
+
+const isAdmin = (userObject) => {
+  return userObject.roles.some(role => role.name === 'admin');
 }
 
 const hideCreateApproval = () => {
@@ -154,6 +188,14 @@ const hideCreateApproval = () => {
 const showCreateApproval = () => {
   isShowCreateApproval.value = true;
 };
+
+const getNameType = (type) => {
+  return types.value[type];
+}
+
+const getStatus = (status) => {
+  return listStatus.value[status];
+}
 </script>
 <style scoped>
 input:focus {

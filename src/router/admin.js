@@ -14,32 +14,38 @@ export default [
             {
                 path: 'users',
                 name: 'users',
-                component: User
+                component: User,
+                meta: { requiresAuth: true, roles: ['admin'] },
             },
             {
                 path: 'recruitments',
                 name: 'recruitments',
-                component: Recruitment
+                component: Recruitment,
+                meta: { requiresAuth: true, roles: ['admin'] },
             },
             {
                 path: 'notifications',
                 name: 'notifications',
-                component: Notification
+                component: Notification,
+                meta: { requiresAuth: true },
             },
             {
                 path: 'approvals',
                 name: 'approvals',
-                component: Approval
+                component: Approval,
+                meta: { requiresAuth: true },
             },
             {
                 path: 'timekeeping',
                 name: 'timekeeping',
-                component: Timekeeping
+                component: Timekeeping,
+                meta: { requiresAuth: true },
             },
             {
                 path: 'salaries',
                 name: 'salaries',
-                component: Salary
+                component: Salary,
+                meta: { requiresAuth: true, roles: ['admin'] },
             },
         ]
     }

@@ -22,9 +22,8 @@
 </template>
 <script setup>
 import {onMounted, ref} from "vue";
-import axios from "axios";
-import {config} from "@/Common/app.config.ts";
 import router from "@/router";
+import api from "@/api";
 
 const currentUser = ref({});
 const errorMessage = ref({});
@@ -40,14 +39,7 @@ const getCurrentUser = () => {
 
 const logout = async () => {
   try {
-    const token = localStorage.getItem('token');
-    await axios.post(
-        config.apiUrl + `logout`, {}, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-    )
+    await api.post('logout', {});
 
     localStorage.setItem('currentUser', null)
     localStorage.setItem('token', null)

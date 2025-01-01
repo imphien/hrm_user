@@ -5,6 +5,7 @@
         :type="type"
         :value="inputValue"
         @input="validateInput"
+        :required="required"
     >
   </div>
 </template>
