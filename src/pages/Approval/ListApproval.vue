@@ -25,7 +25,7 @@
                 :clearable="true"
             />
           </div>
-          <div v-if="isAdmin" class="d-flex">
+          <div v-if="isUserAdmin" class="d-flex">
             <span class="input-title fw-medium">Mã nhân viên</span>
             <input type="text" class="px-2" v-model="userId">
           </div>
@@ -73,11 +73,11 @@
           <td>{{ approval.start_date }}</td>
           <td>{{ approval.end_date }}</td>
           <td>{{ approval.content }}</td>
-          <td v-if="isAdmin && approval.status === 0" class="d-flex justify-content-around">
+          <td v-if="isAdmin() && approval.status === 0" class="d-flex justify-content-around">
             <button class="btn btn-primary" @click="updateApprovals(approval.id, 1)">Đồng ý</button>
             <button class="btn btn-danger" @click="updateApprovals(approval.id, 2)">Từ chối</button>
           </td>
-          <td v-if="!isAdmin || approval.status !== 0" class="d-flex justify-content-around fw-bold">
+          <td v-if="!isAdmin() || approval.status !== 0" class="d-flex justify-content-around fw-bold">
             {{ getStatus(approval.status) }}
           </td>
         </tr>
@@ -89,7 +89,7 @@
   <LoadingComponent :visible="loading" />
 </template>
 <script setup>
-import {computed, onMounted, ref} from "vue";
+import {onMounted, ref} from "vue";
 import Datepicker from "vue3-datepicker";
 import CreateApproval from "@/pages/Approval/CreateApproval";
 import api from "@/api";
@@ -102,6 +102,8 @@ const userId = ref('');
 const selectStatus = ref('');
 const selectType = ref('');
 const approvals = ref([]);
+const isUserAdmin = ref(false);
+const userObject = ref(false);
 const listStatus = ref({
   0 : 'Chưa phê duyệt',
   1 : 'Đã phê duyệt',
@@ -118,13 +120,9 @@ const isShowCreateApproval = ref(false);
 
 const errorMessage = ref({});
 
-const getCurrentUser = computed(() => {
-  const currentUser = localStorage.getItem('currentUser');
-  return JSON.parse(currentUser);
-});
-
 onMounted(() => {
   getListApprovals();
+  isAdmin();
 })
 
 const getListApprovals = async () => {
@@ -154,9 +152,11 @@ const getListApprovals = async () => {
       );
       params.end_date = adjustedDate.toISOString().split("T")[0];
     }
-    if (isAdmin.value) {
-      const currentUser = getCurrentUser.value;
-      params.user_id = currentUser.id;
+    const currentUser = localStorage.getItem('currentUser');
+    userObject.value = JSON.parse(currentUser);
+
+    if (!(userObject.value.roles.some(role => role.name === 'admin') && userObject.value.roles.some(role => role.name === 'pm'))) {
+      params.user_id = userObject.value.id;
     }
 
     const response = await api.get('approvals', { params })
@@ -177,10 +177,6 @@ const updateApprovals = async (id, status) => {
   }
 }
 
-const isAdmin = (userObject) => {
-  return userObject.roles.some(role => role.name === 'admin');
-}
-
 const hideCreateApproval = () => {
   isShowCreateApproval.value = false;
 };
@@ -195,6 +191,13 @@ const getNameType = (type) => {
 
 const getStatus = (status) => {
   return listStatus.value[status];
+}
+
+const isAdmin = () => {
+  const currentUser = localStorage.getItem('currentUser');
+  const userObject = JSON.parse(currentUser);
+
+  return userObject.roles.some(role => role.name === 'admin');
 }
 </script>
 <style scoped>

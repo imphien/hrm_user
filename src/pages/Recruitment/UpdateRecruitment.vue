@@ -10,8 +10,10 @@
               id="roles"
               name="roles"
               v-model="recruitmentInfo.role_id"
+              @change="handleRoleChange"
           >
             <option v-for="role in roles" :value="role.id" :key="role.id">{{ role.name }}</option>
+            <option value="" @click="toRole()">Thêm mới quyền</option>
           </select>
           <p v-if="errors.role_id" class="text-danger">{{ errors.role_id }}</p>
         </div>
@@ -79,6 +81,7 @@ import LoadingComponent from '@/components/LoadingComponent.vue';
 import { onMounted, ref } from 'vue';
 import Datepicker from 'vue3-datepicker';
 import api from '@/api';
+import router from "@/router";
 
 // eslint-disable-next-line no-undef
 defineEmits(['isShow']);
@@ -168,6 +171,12 @@ const disablePastDates = {
     return currentDate < today;
   },
 };
+
+const handleRoleChange = () => {
+  if (recruitmentInfo.value.role_id === "") {
+    router.push('/roles');
+  }
+}
 </script>
 
 <style scoped>

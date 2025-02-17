@@ -3,12 +3,30 @@
     <h1 class="text-title text-center fs-3 fw-bold pt-4 mb-4 pb-4">Thông tin công</h1>
     <div class="d-flex mx-4">
       <div class="mx-4">
-        <input-component class="mb-2" title="Họ và tên" :value="timekeepingInfo.user.full_name" @data="timekeepingInfo.user.full_name = $event"></input-component>
-        <input-component class="mb-2" title="Ngày" :value="timekeepingInfo.date" @data="timekeepingInfo.date = $event"></input-component>
+        <div class="d-flex">
+          <span class="input-title fw-medium">Ngày</span>
+          <Datepicker
+              v-model="timekeepingInfo.date"
+              placeholder="Chọn ngày hết hạn"
+              class="p-2"
+          />
+        </div>
       </div>
       <div class="mx-4">
-        <input-component class="mb-2" title="Giờ" :value="timekeepingInfo.hours" @data="timekeepingInfo.hours = $event"></input-component>
-        <input-component class="mb-2" title="Chấm công" :value="timekeepingInfo.type" @data="timekeepingInfo.type = $event"></input-component>
+        <div class="d-flex justify-content-between pb-2">
+          <span class="input-title fw-medium">Chấm công</span>
+          <select
+              class="role-selected form-select"
+              id="roles"
+              name="roles"
+              v-model="timekeepingInfo.type"
+          >
+            <option v-for="(typeName, typeId) in types" :value="typeId" :key="typeId">{{ typeName }}</option>
+          </select>
+        </div>
+        <input-component class="mb-2" title="Thời gian bắt đầu" :value="timekeepingInfo.start_time" @data="timekeepingInfo.start_time = $event"></input-component>
+
+        <input-component class="mb-2" title="Thời gian kết thúc" :value="timekeepingInfo.end_time" @data="timekeepingInfo.end_time = $event"></input-component>
       </div>
     </div>
     <div class="text-center mt-5">
@@ -21,7 +39,8 @@
 import InputComponent from '@/components/InputComponent.vue'
 import {ref} from "vue";
 import {config} from "@/Common/app.config.ts";
-import axios from "axios";
+import Datepicker from 'vue3-datepicker';
+import api from "@/api";
 
 // eslint-disable-next-line no-undef
 defineEmits(['isShow'])
@@ -31,18 +50,56 @@ const props = defineProps(['timekeeping']);
 
 const timekeepingInfo = ref({
   id: props.timekeeping.id,
-  date : props.timekeeping.date,
+  date : new Date(props.timekeeping.date),
   type : props.timekeeping.type,
   hours: props.timekeeping.hours,
-  user: props.timekeeping.user,
+  user_id: props.timekeeping.user_id,
+  start_time: props.timekeeping.start_time,
+  end_time: props.timekeeping.end_time,
 })
+const types = ref({
+  1: 'Công thường',
+  2: 'Tăng ca',
+});
+
+const convertToMinutes = (timeStr) => {
+  const [hours, minutes, seconds] = timeStr.split(':').map(Number);
+  return hours * 60 + minutes + Math.floor(seconds / 60);
+};
+
+const calculateHours = (start, end) => {
+  const startMinutes = convertToMinutes(start);
+  const endMinutes = convertToMinutes(end);
+
+  const totalMinutes =
+      endMinutes >= startMinutes
+          ? endMinutes - startMinutes
+          : 24 * 60 - startMinutes + endMinutes;
+
+  const hours = totalMinutes / 60;
+  return parseFloat(hours.toFixed(1));
+};
 
 const errorMessage = ref('');
 
 const updateRecruitment = async (timekeepingId) => {
   try {
-    await axios.put(
-        `${config.apiUrl}timekeeping/${timekeepingId}`, timekeepingInfo.value
+    const payload = { ...timekeepingInfo.value };
+
+    if (payload.date instanceof Date) {
+      const adjustedDate = new Date(
+          payload.date.getTime() + Math.abs(payload.date.getTimezoneOffset() * 60000)
+      );
+      payload.date = adjustedDate.toISOString().split('T')[0];
+    }
+
+    payload.hours = calculateHours(
+        payload.start_time,
+        payload.end_time
+    );
+
+    await api.put(
+        `${config.apiUrl}timekeeping/${timekeepingId}`, payload
     )
     location.reload();
   } catch (err) {
@@ -52,7 +109,7 @@ const updateRecruitment = async (timekeepingId) => {
 </script>
 <style scoped>
 .content {
-  width: 750px;
+  width: 815px;
   height: 450px;
   position: absolute;
   background-color: white;

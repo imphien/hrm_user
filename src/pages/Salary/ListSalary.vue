@@ -6,9 +6,12 @@
     <div class="d-flex pt-3">
       <div class="col-9">
         <div class="d-flex justify-content-around">
-          <div class="d-flex">
-            <span class="input-title fw-medium">Tháng</span>
-            <input type="text" class="px-2" v-model="month">
+          <div class="d-flex flex-column">
+            <div class="d-flex">
+              <span class="input-title fw-medium">Tháng</span>
+              <input type="text" class="px-2" v-model="month" placeholder="YYYY-MM">
+            </div>
+            <span v-if="monthError" class="text-danger mt-1">{{ monthError }}</span>
           </div>
           <div class="d-flex">
             <span class="input-title fw-medium">Họ và tên</span>
@@ -52,11 +55,11 @@
           <td>{{ salary.user.full_name }}</td>
           <td>{{ salary.month }}</td>
           <td>{{ salary.days }}</td>
-          <td>{{ salary.salary }}</td>
-          <td>{{ salary.allowance }}</td>
-          <td>{{ salary.dedution }}</td>
-          <td>{{ salary.bonus }}</td>
-          <td>100000</td>
+          <td>{{ salary.salary_format }}</td>
+          <td>{{ salary.allowance_format }}</td>
+          <td>{{ salary.dedution_format }}</td>
+          <td>{{ salary.bonus_format }}</td>
+          <td>{{ salary.total }}</td>
           <td class="d-flex justify-content-around">
             <button class="btn btn-danger" @click="showUpdateSalary(salary)">Sửa</button>
           </td>
@@ -67,13 +70,13 @@
   </div>
   <UpdateSalary v-if="isShowUpdateSalary" :salary="salaryDetail" @hide="hideUpdateSalary">
   </UpdateSalary>
+  <LoadingComponent :visible="loading" />
 </template>
 <script setup>
-import {onMounted, ref} from "vue";
-import axios from "axios";
-import {config} from "@/Common/app.config.ts";
+import { onMounted, ref } from "vue";
 import UpdateSalary from "@/pages/Salary/UpdateSalary";
 import api from "@/api";
+import LoadingComponent from "@/components/LoadingComponent.vue";
 
 const month = ref('');
 const fullName = ref('');
@@ -82,15 +85,38 @@ const salaries = ref([]);
 const salaryDetail = ref({});
 const isShowUpdateSalary = ref(false);
 const fileInput = ref(null);
+const loading = ref(false);
+const monthError = ref('');
 
 const errorMessage = ref({});
 
 onMounted(() => {
   getListSalaries();
-})
+});
+
+const validateMonth = () => {
+  const monthRegex = /^\d{4}-(0[1-9]|1[0-2])$/;
+  if (!monthRegex.test(month.value)) {
+    monthError.value = 'Tháng không đúng định dạng.';
+    return false;
+  }
+  monthError.value = '';
+  return true;
+};
+
+const formatCurrency = (value) => {
+  if (value === null || value === undefined) return "0";
+  return parseInt(value, 10).toLocaleString("vi-VN") + " ₫";
+};
 
 const getListSalaries = async () => {
   try {
+    loading.value = true;
+
+    if (month.value && !validateMonth()) {
+      return;
+    }
+
     let params = {};
     if (month.value) {
       params.month = month.value;
@@ -102,37 +128,66 @@ const getListSalaries = async () => {
       params.user_id = userId.value;
     }
 
-    const response = await api.get('salaries', { params })
-    salaries.value = response.data
+    const response = await api.get("salaries", { params });
+    salaries.value = response.data.map((salary) => {
+      const total =
+          (salary.salary || 0) +
+          (salary.allowance || 0) -
+          (salary.dedution || 0) +
+          (salary.bonus || 0);
+
+      return {
+        ...salary,
+        salary_format: formatCurrency(salary.salary),
+        allowance_format: formatCurrency(salary.allowance),
+        dedution_format: formatCurrency(salary.dedution),
+        bonus_format: formatCurrency(salary.bonus),
+        total: formatCurrency(total),
+      };
+    });
   } catch (err) {
-    errorMessage.value = err.response.data.errors;
+    errorMessage.value = err.response?.data?.errors || "Có lỗi xảy ra.";
+  } finally {
+    loading.value = false;
   }
-}
+};
 
 const showUpdateSalary = (salary) => {
-  salaryDetail.value = salary
-  isShowUpdateSalary.value = true
-}
+  salaryDetail.value = salary;
+  isShowUpdateSalary.value = true;
+};
 
 const hideUpdateSalary = () => {
-  isShowUpdateSalary.value = false
-}
+  isShowUpdateSalary.value = false;
+};
 
 const triggerFileInput = () => {
   fileInput.value.click();
-}
+};
 
 const handleFileChange = async (event) => {
-  const file = event.target.files[0];
+  try {
+    loading.value = true;
+    const file = event.target.files[0];
 
-  const formData = new FormData();
-  formData.append('file', file);
+    const formData = new FormData();
+    formData.append("file", file);
 
-  await axios.post(
-      config.apiUrl + `salaries/import`, formData
-  )
-}
+    await api.post("salaries/import", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+    location.reload();
+  } catch (error) {
+    console.error("Error uploading file:", error);
+    alert("Có lỗi xảy ra khi tải lên tệp.");
+  } finally {
+    loading.value = false;
+  }
+};
 </script>
+
 <style scoped>
 input:focus {
   border-color: #86b7fe;

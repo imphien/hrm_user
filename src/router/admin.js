@@ -5,6 +5,7 @@ import Notification from '../pages/Notification/ListNotification.vue'
 import Approval from '../pages/Approval/ListApproval.vue'
 import Timekeeping from '../pages/Timekeeping/ListTimekeeping.vue'
 import Salary from '../pages/Salary/ListSalary.vue'
+import Role from '../pages/Role/ListRole.vue'
 
 export default [
     {
@@ -45,6 +46,12 @@ export default [
                 path: 'salaries',
                 name: 'salaries',
                 component: Salary,
+                meta: { requiresAuth: true, roles: ['admin'] },
+            },
+            {
+                path: 'roles',
+                name: 'roles',
+                component: Role,
                 meta: { requiresAuth: true, roles: ['admin'] },
             },
         ]

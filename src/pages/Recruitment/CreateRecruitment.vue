@@ -1,49 +1,35 @@
 <template>
   <div class="content">
-    <h1 class="text-title text-center fs-3 fw-bold pt-4 mb-4">Tạo mới thông tin tuyển dụng</h1>
-    <div class="d-flex mx-4">
-      <div class="mx-4">
-        <div class="d-flex justify-content-between pb-2">
-          <span class="input-title fw-medium">Vai trò</span>
-          <select
-              class="role-selected form-select"
-              id="roles"
-              name="roles"
-              v-model="recruitmentInfo.role_id"
-          >
-            <option value="">Chọn vai trò</option>
-            <option v-for="role in roles" :value="role.id" :key="role.id">{{ role.name }}</option>
-          </select>
+    <h1 class="text-title text-center fs-3 fw-bold pt-4 mb-4">Tạo mới thông báo</h1>
+    <div class="mx-4">
+      <div class="date mx-4 d-flex">
+        <div>
+          <div class="d-flex pb-2">
+            <span class="input-title fw-medium">Ngày bắt đầu</span>
+            <Datepicker
+                v-model="startDate"
+                placeholder="Chọn ngày bắt đầu"
+                class="p-2"
+                :disabled-dates="disablePastDates"
+                :clearable="true"
+            />
+          </div>
+          <p v-if="errors.start_date" class="text-danger">{{ errors.start_date }}</p>
         </div>
-        <p v-if="errors.role_id" class="text-danger">{{ errors.role_id }}</p>
 
-        <input-component
-            class="mb-2"
-            title="Số lượng"
-            type="number"
-            @data="recruitmentInfo.quantity = $event"
-        ></input-component>
-        <p v-if="errors.quantity" class="text-danger">{{ errors.quantity }}</p>
-      </div>
-
-      <div>
-        <input-component
-            class="mb-2"
-            title="Yêu cầu"
-            @data="recruitmentInfo.requirement = $event"
-        ></input-component>
-        <p v-if="errors.requirement" class="text-danger">{{ errors.requirement }}</p>
-
-        <div class="d-flex">
-          <span class="input-title fw-medium">Ngày hết hạn</span>
-          <Datepicker
-              v-model="dateExpired"
-              placeholder="Chọn ngày hết hạn"
-              class="p-2"
-              :disabled-dates="disablePastDates"
-          />
+        <div>
+          <div class="d-flex pb-2">
+            <span class="input-title fw-medium">Ngày kết thúc</span>
+            <Datepicker
+                v-model="endDate"
+                placeholder="Chọn ngày kết thúc"
+                class="p-2"
+                :disabled-dates="disablePastDates"
+                :clearable="true"
+            />
+          </div>
+          <p v-if="errors.end_date" class="text-danger">{{ errors.end_date }}</p>
         </div>
-        <p v-if="errors.expired" class="text-danger">{{ errors.expired }}</p>
       </div>
     </div>
 
@@ -52,111 +38,84 @@
       <textarea
           class="form-control resize-none"
           :rows="3"
-          v-model="recruitmentInfo.content"
+          v-model="notificationInfo.content"
       ></textarea>
       <p v-if="errors.content" class="text-danger">{{ errors.content }}</p>
     </div>
 
     <div class="text-center mt-4">
-      <button
-          type="button"
-          class="btn btn-primary me-3 px-4"
-          @click="createRecruitment"
-      >
-        Lưu
-      </button>
-      <button type="button" class="btn btn-danger me-3 px-4" @click="$emit('hide')">
-        Huỷ
-      </button>
+      <button type="button" class="btn btn-primary me-3 px-4" @click="createNotification">Lưu</button>
+      <button type="button" class="btn btn-danger me-3 px-4" @click="$emit('hide')">Huỷ</button>
     </div>
-    <LoadingComponent :visible="loading" />
   </div>
 </template>
 
 <script setup>
-import InputComponent from '@/components/InputComponent.vue';
-import LoadingComponent from '@/components/LoadingComponent.vue';
-import { onMounted, ref } from 'vue';
-import Datepicker from 'vue3-datepicker';
-import api from '@/api';
+import { ref } from "vue";
+import { config } from "@/Common/app.config.ts";
+import axios from "axios";
+import Datepicker from "vue3-datepicker";
 
 // eslint-disable-next-line no-undef
 defineEmits(['isShow']);
 
-const dateExpired = ref('');
-const roles = ref([]);
-
-const recruitmentInfo = ref({
+const notificationInfo = ref({
   content: '',
-  quantity: '',
-  role_id: '',
-  requirement: '',
-  expired: '',
+  start_date: '',
+  end_date: '',
 });
-const loading = ref(false);
+const startDate = ref('');
+const endDate = ref('');
+const errors = ref({}); // Đối tượng lưu lỗi
 
-const errors = ref({});
+const errorMessage = ref('');
 
-onMounted(() => {
-  getListRoles();
-});
-
-const createRecruitment = async () => {
+const createNotification = async () => {
+  // Reset lỗi
   errors.value = {};
+
+  // Validate các trường
   let isValid = true;
 
-  for (const key in recruitmentInfo.value) {
-    if (key === 'expired') {
-      continue;
-    }
-    if (!recruitmentInfo.value[key]) {
-      let title = '';
-      if (key === 'role_id') {
-        title = 'vai trò';
-      }
-      if (key === 'content') {
-        title = 'nội dung';
-      }
-      if (key === 'quantity') {
-        title = 'số lượng';
-      }
-      if (key === 'requirement') {
-        title = 'yêu cầu';
-      }
-      errors.value[key] = `Không được để trống ${title}`;
-      isValid = false;
-    }
+  if (!startDate.value) {
+    errors.value.start_date = "Không được để trống ngày bắt đầu";
+    isValid = false;
   }
-
-  if (!dateExpired.value) {
-    errors.value.expired = 'Không được để trống ngày hết hạn';
+  if (!endDate.value) {
+    errors.value.end_date = "Không được để trống ngày kết thúc";
+    isValid = false;
+  }
+  if (!notificationInfo.value.content) {
+    errors.value.content = "Không được để trống nội dung";
     isValid = false;
   }
 
+  // Nếu có lỗi, dừng xử lý
   if (!isValid) return;
 
   try {
-    loading.value = true;
-    const date = new Date(dateExpired.value);
-    recruitmentInfo.value.expired = new Intl.DateTimeFormat('en-CA').format(date);
-    await api.post('recruitments', recruitmentInfo.value);
+    const payload = { ...notificationInfo.value };
+
+    if (startDate.value instanceof Date) {
+      const adjustedDate = new Date(
+          startDate.value.getTime() + Math.abs(startDate.value.getTimezoneOffset() * 60000)
+      );
+      payload.start_date = adjustedDate.toISOString().split("T")[0];
+    }
+
+    if (endDate.value instanceof Date) {
+      const adjustedDate = new Date(
+          endDate.value.getTime() + Math.abs(endDate.value.getTimezoneOffset() * 60000)
+      );
+      payload.end_date = adjustedDate.toISOString().split("T")[0];
+    }
+
+    await axios.post(
+        `${config.apiUrl}notifications`, payload
+    );
     location.reload();
   } catch (err) {
-    errors.value.apiError = err.response?.data.errors || 'Đã xảy ra lỗi.';
-  } finally {
-    loading.value = false;
-  }
-};
-
-const getListRoles = async () => {
-  try {
-    loading.value = true;
-    const response = await api.get('roles');
-    roles.value = response.data.data;
-  } catch (err) {
-    errors.value.apiError = err.response?.data.errors || 'Không thể tải danh sách vai trò.';
-  } finally {
-    loading.value = false;
+    errorMessage.value = err.response?.data.errors || "Đã xảy ra lỗi khi tạo thông báo.";
   }
 };
 
@@ -172,7 +131,7 @@ const disablePastDates = {
 <style scoped>
 .content {
   width: 750px;
-  height: 550px;
+  height: 450px;
   position: absolute;
   background-color: white;
   left: 0;
@@ -182,8 +141,13 @@ const disablePastDates = {
   border: 1px solid #dee2e6;
 }
 
-.input-title {
-  padding: 6px 20px 0 0;
+select {
+  border: 1px solid #dee2e6;
+  border-radius: 0.375rem;
+}
+
+.date {
+  gap: 28px;
 }
 
 .text-danger {

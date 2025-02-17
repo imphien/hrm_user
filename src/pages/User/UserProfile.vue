@@ -19,6 +19,8 @@
           <div class="d-flex">
             <span class="input-title fw-medium">Vai trò</span>
             <select class="role-selected form-select" id="roles" name="roles" v-model="selectRole">
+              <option value="" disabled hidden>Chọn vai trò</option>
+              <option value="">Không chọn</option>
               <option v-for="role in roles" :value="role.id" :key="role.id">{{ role.name }}</option>
             </select>
           </div>
@@ -47,20 +49,20 @@
         </tr>
         </thead>
         <tbody>
-          <tr class="text-center" v-for="user in users" :key="user.id">
-            <th scope="row">{{ user.id }}</th>
-            <td>{{ user.full_name }}</td>
-            <td>{{ user.phone }}</td>
-            <td>{{ user.birthday }}</td>
-            <td>Nam</td>
-            <td>{{ user.email }}</td>
-            <td>{{ user.roles.length > 0 ? user.roles[0].name : '' }}</td>
-            <td>Hoạt động</td>
-            <td class="d-flex justify-content-around">
-              <button class="btn btn-primary" @click="showUpdateUser(user)">Sửa</button>
-              <button class="btn btn-danger" @click="deleteUser(user.id)">Xoá</button>
-            </td>
-          </tr>
+        <tr class="text-center" v-for="user in users" :key="user.id">
+          <th scope="row">{{ user.id }}</th>
+          <td>{{ user.full_name }}</td>
+          <td>{{ user.phone }}</td>
+          <td>{{ user.birthday }}</td>
+          <td>{{ user.sex === 0 ? 'Nam' : 'Nữ' }}</td>
+          <td>{{ user.email }}</td>
+          <td>{{ user.roles.length > 0 ? user.roles[0].name : '' }}</td>
+          <td>Hoạt động</td>
+          <td class="d-flex justify-content-around">
+            <button class="btn btn-primary" @click="showUpdateUser(user)">Sửa</button>
+            <button class="btn btn-danger" @click="deleteUser(user.id)">Xoá</button>
+          </td>
+        </tr>
         </tbody>
       </table>
     </div>
@@ -69,105 +71,120 @@
   </CreateUser>
   <UpdateUser v-if="isShowUpdateUser" :user="userDetail" @hide="hideUpdateUser">
   </UpdateUser>
+  <LoadingComponent :visible="loading" />
 </template>
 <script setup>
-  import {onMounted, ref} from "vue";
+import {onMounted, ref} from "vue";
+import CreateUser from './CreateUser';
+import UpdateUser from './UpdateUser';
+import api from "@/api";
+import LoadingComponent from "@/components/LoadingComponent.vue";
 
-  import CreateUser from './CreateUser';
-  import UpdateUser from './UpdateUser';
-  import api from "@/api";
+const loading = ref(false);
+const errorMessage = ref({});
+const users = ref([]);
+const roles = ref([]);
+const selectRole = ref('');
+const userId = ref('');
+const userFullName = ref('');
+const isShowCreateUser = ref(false);
+const isShowUpdateUser = ref(false);
+const userDetail = ref({});
 
-  const errorMessage = ref({});
-  const users = ref([]);
-  const roles = ref([]);
-  const selectRole = ref('');
-  const userId = ref('');
-  const userFullName = ref('');
-  const isShowCreateUser = ref(false);
-  const isShowUpdateUser = ref(false);
-  const userDetail = ref({});
+const getListUsers = async () => {
+  try {
+    loading.value = true;
+    const response = await api.get('users')
 
-  const getListUsers = async () => {
-    try {
-      const response = await api.get('users')
-      
-      users.value = response.data;
-    } catch (err) {
-      errorMessage.value = err.response.data.errors;
+    users.value = response.data;
+  } catch (err) {
+    errorMessage.value = err.response.data.errors;
+  } finally {
+    loading.value = false;
+  }
+}
+
+const getListRoles = async () => {
+  try {
+    loading.value = true;
+    const response = await api.get('roles', {})
+    roles.value = response.data.data
+  } catch (err) {
+    errorMessage.value = err.response.data.errors;
+  } finally {
+    loading.value = false;
+  }
+}
+
+const searchUsers = async () => {
+  try {
+    loading.value = true;
+    let params = {};
+    if (selectRole.value) {
+      params.role_id = selectRole.value;
     }
-  }
-
-  const getListRoles = async () => {
-    try {
-      const response = await api.get('roles', {})
-      roles.value = response.data.data
-    } catch (err) {
-      errorMessage.value = err.response.data.errors;
+    if (userId.value) {
+      params.user_id = userId.value;
     }
-  }
-
-  const searchUsers = async () => {
-    try {
-      let params = {};
-      if (selectRole.value) {
-        params.role_id = selectRole.value;
-      }
-      if (userId.value) {
-        params.user_id = userId.value;
-      }
-      if (userFullName.value) {
-        params.full_name = userFullName.value;
-      }
-
-      const response = await api.get('users', params)
-      users.value = response.data;
-    } catch (err) {
-      errorMessage.value = err.response.data.errors;
+    if (userFullName.value) {
+      params.full_name = userFullName.value;
     }
-  }
+    console.log(params)
 
-  const deleteUser = async (userId) => {
-    try {
-      await api.delete(`users/${userId}`,)
-      location.reload();
-    } catch (err) {
-      errorMessage.value = err.response.data.errors;
-    }
+    const response = await api.get('users', {params})
+    users.value = response.data;
+  } catch (err) {
+    errorMessage.value = err.response.data.errors;
+  } finally {
+    loading.value = false;
   }
+}
 
-  const showCreateUser = () => {
-    isShowCreateUser.value = true
+const deleteUser = async (userId) => {
+  try {
+    loading.value = true;
+    await api.delete(`users/${userId}`,)
+    location.reload();
+  } catch (err) {
+    errorMessage.value = err.response.data.errors;
+  } finally {
+    loading.value = false;
   }
+}
 
-  const hideCreateUser = () => {
-    isShowCreateUser.value = false
-  }
+const showCreateUser = () => {
+  isShowCreateUser.value = true
+}
 
-  const showUpdateUser = (user) => {
-    userDetail.value = user
-    isShowUpdateUser.value = true
-  }
+const hideCreateUser = () => {
+  isShowCreateUser.value = false
+}
 
-  const hideUpdateUser = () => {
-    isShowUpdateUser.value = false
-  }
+const showUpdateUser = (user) => {
+  userDetail.value = user
+  isShowUpdateUser.value = true
+}
 
-  onMounted(() => {
-    getListUsers();
-    getListRoles();
-  })
+const hideUpdateUser = () => {
+  isShowUpdateUser.value = false
+}
+
+onMounted(() => {
+  getListUsers();
+  getListRoles();
+})
 </script>
 <style>
-  .input-title {
-    padding: 6px 15px 0 0;
-  }
+.input-title {
+  padding: 6px 15px 0 0;
+}
 
-  .role-selected {
-    width: 175px !important;
-  }
+.role-selected {
+  width: 175px !important;
+}
 
-  input {
-    border: 1px solid #dee2e6;
-    border-radius: 0.375rem;
-  }
+input {
+  border: 1px solid #dee2e6;
+  border-radius: 0.375rem;
+}
 </style>

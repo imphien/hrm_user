@@ -30,7 +30,7 @@
                 <i class="fa-solid fa-magnifying-glass"></i> Tìm kiếm
               </button>
             </div>
-            <div>
+            <div v-if="isAdmin()">
               <button class="btn btn-primary" @click="showCreateNotification"> Thêm mới</button>
             </div>
           </div>
@@ -78,6 +78,7 @@ const loading = ref(false);
 
 onMounted(() => {
   getListNotifications();
+  isAdmin();
 })
 
 const getListNotifications = async () => {
@@ -110,6 +111,13 @@ const showCreateNotification = () => {
 function formatDate(dateString) {
   const date = new Date(dateString);
   return new Intl.DateTimeFormat('en-CA').format(date);
+}
+
+const isAdmin = () => {
+  const currentUser = localStorage.getItem('currentUser');
+  const userObject = JSON.parse(currentUser);
+
+  return userObject.roles.some(role => role.name === 'admin');
 }
 </script>
 <style scoped>

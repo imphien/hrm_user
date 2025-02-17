@@ -19,6 +19,9 @@
       <li v-if="isAdmin()" class="list-group-item">
         <router-link :to="{ name: 'users' }" class="text-decoration-none text-dark">Quản lý tài khoản</router-link>
       </li>
+      <li v-if="isAdmin()" class="list-group-item">
+        <router-link :to="{ name: 'roles' }" class="text-decoration-none text-dark">Quản lý quyền</router-link>
+      </li>
     </ul>
   </div>
 </template>

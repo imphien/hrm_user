@@ -9,11 +9,11 @@
                 <div class="ps-5">
                     <div class="py-2">
                         <div>{{ currentUser.full_name }}</div>
-                        <div>Quan tri he thong</div>
+                        <div>Mã nhân viên: {{ currentUser.id }}</div>
                     </div>
                     <div>
-                        <a href="#">Đổi mật khẩu</a>
-                        <a class="ps-3" href="#" @click="logout">Đăng xuất</a>
+<!--                        <a href="#">Đổi mật khẩu</a>-->
+                        <a class="" href="#" @click="logout">Đăng xuất</a>
                     </div>
                 </div>
             </div>
